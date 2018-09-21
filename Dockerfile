@@ -7,7 +7,8 @@ ENV SONAR_VERSION=6.7 \
     SONARQUBE_HOME=/opt/sonarqube \
     SONARQUBE_JDBC_USERNAME=sonar \
     SONARQUBE_JDBC_PASSWORD=sonar \
-    SONARQUBE_JDBC_URL=
+    SONARQUBE_JDBC_URL= \
+    GPG_KEYS=F1182E81C792928921DBCAB4CFCA4A29D26468DE
 
 USER root
 EXPOSE 9000
@@ -19,7 +20,9 @@ RUN set -x \
     #       Key fingerprint = F118 2E81 C792 9289 21DB  CAB4 CFCA 4A29 D264 68DE
     # uid                  sonarsource_deployer (Sonarsource Deployer) <infra@sonarsource.com>
     # sub   2048R/06855C1D 2015-05-25
-    && gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE \
+    && (gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEYS" \
+  	|| gpg --keyserver pgp.mit.edu --recv-keys "$GPG_KEYS" \
+  	|| gpg --keyserver keyserver.pgp.com --recv-keys "$GPG_KEYS" ) \
 
     && cd /opt \
     && curl -o sonarqube.zip -fSL https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip \
